@@ -59,3 +59,16 @@ func KlantAll() []Klant {
 	}
 	return klanten
 }
+
+func searchData(query string) []Klant {
+	var klanten []Klant
+	rows, err := customer.Query("SELECT * FROM customer WHERE voornaam LIKE '%" + query + "%'")
+	handleError(err, "Querying SELECT * FROM customer with query")
+	defer rows.Close()
+	for rows.Next() {
+		var klant Klant
+		rows.Scan(&klant.ID, &klant.Voornaam, &klant.Achternaam, &klant.Aankomst, &klant.Vertrek, &klant.Staplaats, &klant.Opmerking)
+		klanten = append(klanten, klant)
+	}
+	return klanten
+}

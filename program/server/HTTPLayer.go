@@ -13,7 +13,7 @@ func initHTTP() {
 	csks := mux.NewRouter().StrictSlash(true)
 
 	csks.HandleFunc("/", handleRootEndpoint)
-	csks.HandleFunc("/klant", handleKlantAllEndpoint).Methods("GET")
+	csks.HandleFunc("/klant", handleKlantEndpoint).Methods("GET")
 	csks.HandleFunc("/klant/add", handleKlantAddEndpoint).Methods("POST")
 	csks.HandleFunc("/klant/remove", handleKlantRemoveEndpoint).Methods("DELETE")
 
@@ -47,13 +47,23 @@ func handleKlantRemoveEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleKlantAllEndpoint(w http.ResponseWriter, r *http.Request) {
+func handleKlantEndpoint(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	klanten := getKlantAll()
-	if klanten == nil {
-		json.NewEncoder(w).Encode("Empty Database detected. No information present.")
+	searchQuery, ok := r.URL.Query()["search"]
+	if ok && len(searchQuery) > 0 {
+		result := getSearchData(searchQuery[0])
+		if result == nil {
+			json.NewEncoder(w).Encode("No results found")
+		} else {
+			json.NewEncoder(w).Encode(result)
+		}
 	} else {
-		json.NewEncoder(w).Encode(klanten)
+		klanten := getKlantAll()
+		if klanten == nil {
+			json.NewEncoder(w).Encode("Empty Database detected. No information present.")
+		} else {
+			json.NewEncoder(w).Encode(klanten)
+		}
 	}
 }

@@ -42,6 +42,10 @@ func deleteRemoveKlant(idQueryStr string) bool {
 	return true
 }
 
+func getSearchData(query string) []Klant {
+	return searchData(query)
+}
+
 func getKlantAll() []Klant {
 	return KlantAll()
 }
